@@ -1,0 +1,122 @@
+/* Header */
+.header {
+  background-color: #7e0f34; /* clean white */
+  color: #ffffff; /* dark text */
+  padding: 0.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb; /* subtle divider */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Flex container */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1300px;
+  margin: 0 auto;
+  flex-wrap: wrap; /* allow items to wrap on smaller screens */
+  gap: 0.5rem;
+}
+
+/* Logo */
+.logo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.logo:hover {
+  color: #3b82f6; /* subtle hover */
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap; /* wrap nav links if needed */
+}
+
+.nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+  padding: 0.25rem 0.5rem; /* touch-friendly */
+  border-radius: 0.25rem;
+}
+
+.nav a:hover {
+  color: #ff046c;
+  background-color: rgba(59, 130, 246, 0.1); /* subtle hover bg for touch devices */
+}
+
+/* User info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  flex-wrap: wrap; /* allow wrapping on small screens */
+}
+
+.user-info button {
+  background-color: #dd4848;
+  color: #ffffff;
+  border: none;
+  padding: 0.4rem 0.9rem; /* slightly larger for touch */
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.user-info button:hover {
+  background-color: #bd079e;
+  transform: translateY(-1px);
+}
+
+/* Responsive: tablet and mobile */
+@media (max-width: 1024px) {
+  .header-container {
+    padding: 0.5rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .nav {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .nav a {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .user-info button {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.875rem;
+  }
+}

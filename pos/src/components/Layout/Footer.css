@@ -1,0 +1,17 @@
+.footer {
+  background-color: #7e0f34; /* light gray background */
+  color: #ffffff; /* subtle gray text */
+  padding: 0.75rem 2rem;
+  border-top: 1px solid #e5e7eb; /* thin top border */
+  text-align: center;
+  font-size: 0.875rem; 
+  position:fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Center content if more elements added */
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}

@@ -1,0 +1,139 @@
+/* OrderForm.css */
+
+.order-form-page {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.order-form-page h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.order-form .form-group {
+  margin-bottom: 20px;
+}
+
+.order-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+.order-form input[type="text"],
+.order-form input[type="number"],
+.order-form select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.order-form select {
+  cursor: pointer;
+}
+
+.product-selection ul.product-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.product-selection ul.product-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.product-selection ul.product-list li button {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.product-selection ul.product-list li button:hover {
+  background-color: #0056b3;
+}
+
+.order-summary table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.order-summary table th,
+.order-summary table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.order-summary table th {
+  background-color: #f4f4f4;
+}
+
+.order-summary input[type="number"] {
+  width: 60px;
+  text-align: center;
+}
+
+.order-summary button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #dc3545;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.order-summary button:hover {
+  background-color: #a71d2a;
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+}
+
+.submit-btn:hover {
+  background-color: #1e7e34;
+}
+
+@media (max-width: 600px) {
+  .product-selection ul.product-list li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-summary table th,
+  .order-summary table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
