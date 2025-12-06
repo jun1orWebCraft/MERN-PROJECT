@@ -18,6 +18,8 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -33,7 +35,20 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    let errors = {};
 
+  // Check for empty fields
+  Object.keys(formData).forEach((key) => {
+    if (!formData[key]) {
+      errors[key] = true;
+    }
+  });
+
+  if (Object.keys(errors).length > 0) {
+    setFieldErrors(errors);
+    setError("All fields are required");
+    return;
+  }
     // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -65,70 +80,72 @@ const Register = () => {
 
   return (
     <div className="auth-container">
-      <Card className="auth-card">
-        <h2 className="auth-title">REGISTER</h2>
+      <Card title="Register" className="auth-card">
         <form onSubmit={handleSubmit}>
           {error && <div className="error-alert">{error}</div>}
 
-          <div className="form-row">
-            <Input
-              label="Username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Choose a username"
-              required
-            />
-            <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+          <Input
+            label="Username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="Choose a username"
+            required
+            error={fieldErrors.username}
+          />
 
-          <div className="form-row">
-            <Input
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              placeholder="Enter your first name"
-              required
-            />
-            <Input
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              placeholder="Enter your last name"
-              required
-            />
-          </div>
+          <Input
+            label="Email"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            required
+            error={fieldErrors.email}
+          />
 
-          <div className="form-row">
-            <Input
-              label="Password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
-            <Input
-              label="Confirm Password"
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              required
-            />
-          </div>
+          <Input
+            label="First Name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="Enter your first name"
+            required
+            error={fieldErrors.firstName}
+          />
+
+          <Input
+            label="Last Name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Enter your last name"
+            required
+            error={fieldErrors.lastName}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter your password"
+            required
+            error={fieldErrors.password}
+          />
+
+          <Input
+            label="Confirm Password"
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="Confirm your password"
+            required
+            error={fieldErrors.confirmPassword}
+          />
 
           <Button type="submit" variant="primary" className="full-width">
             Register

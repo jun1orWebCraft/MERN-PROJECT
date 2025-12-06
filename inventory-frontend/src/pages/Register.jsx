@@ -18,6 +18,8 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -33,7 +35,20 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    let errors = {};
 
+  // Check for empty fields
+  Object.keys(formData).forEach((key) => {
+    if (!formData[key]) {
+      errors[key] = true;
+    }
+  });
+
+  if (Object.keys(errors).length > 0) {
+    setFieldErrors(errors);
+    setError("All fields are required");
+    return;
+  }
     // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -76,6 +91,7 @@ const Register = () => {
             onChange={handleChange}
             placeholder="Choose a username"
             required
+            error={fieldErrors.username}
           />
 
           <Input
@@ -86,6 +102,7 @@ const Register = () => {
             onChange={handleChange}
             placeholder="Enter your email"
             required
+            error={fieldErrors.email}
           />
 
           <Input
@@ -95,6 +112,7 @@ const Register = () => {
             onChange={handleChange}
             placeholder="Enter your first name"
             required
+            error={fieldErrors.firstName}
           />
 
           <Input
@@ -104,6 +122,7 @@ const Register = () => {
             onChange={handleChange}
             placeholder="Enter your last name"
             required
+            error={fieldErrors.lastName}
           />
 
           <Input
@@ -114,6 +133,7 @@ const Register = () => {
             onChange={handleChange}
             placeholder="Enter your password"
             required
+            error={fieldErrors.password}
           />
 
           <Input
@@ -124,6 +144,7 @@ const Register = () => {
             onChange={handleChange}
             placeholder="Confirm your password"
             required
+            error={fieldErrors.confirmPassword}
           />
 
           <Button type="submit" variant="primary" className="full-width">

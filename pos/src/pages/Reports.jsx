@@ -1,4 +1,3 @@
-// Reports.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { orderService } from '../services/orderService';
 import { productService } from '../services/productService';
@@ -18,7 +17,6 @@ import {
 import { STORAGE_KEYS } from '../utils/constants';
 import './Reports.css';
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -39,43 +37,58 @@ const Reports = () => {
   const [prodSearch, setProdSearch] = useState('');
   const [prodFilter, setProdFilter] = useState('All');
 
-  // Fetch all orders
+  // Fetch all transactions/orders
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
       if (!token) return;
 
       const res = await orderService.getAll(token);
-      const data = Array.isArray(res.data) ? res.data : [];
-      setTransactions(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
+      console.log('Orders API response:', res);
+
+      // Extract the actual array from paginated response
+      const data = res?.data?.data || [];
+      if (!Array.isArray(data)) {
+        console.error('Orders data is not an array:', data);
+        setTransactions([]);
+        return;
+      }
+
+      setTransactions(
+        data
+          .map(tx => ({ ...tx, orderId: tx.orderId || crypto.randomUUID() })) // ensure unique IDs
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+      );
     } catch (err) {
       console.error('Error fetching orders:', err);
+      setTransactions([]);
     }
   };
 
-  // Fetch products
+  // Fetch all products
   const fetchProducts = async () => {
     try {
       const res = await productService.getAll();
-      const data = Array.isArray(res.data) ? res.data : [];
-      setProducts(data);
+      const data = res?.data || [];
+      setProducts(data.map(p => ({ ...p, _id: p._id || crypto.randomUUID() }))); // ensure unique IDs
     } catch (err) {
       console.error('Error fetching products:', err);
+      setProducts([]);
     }
   };
 
-  // Initial load
   useEffect(() => {
     fetchOrders();
     fetchProducts();
 
+    // Listen to localStorage updates (live updates from OrderForm)
     const handleNewOrder = () => {
       const lastOrder = JSON.parse(localStorage.getItem('LAST_ORDER') || 'null');
       if (lastOrder) {
         setTransactions(prev => {
           const exists = prev.find(tx => tx.orderId === lastOrder.orderId);
           if (exists) return prev;
-          return [lastOrder, ...prev];
+          return [{ ...lastOrder, orderId: lastOrder.orderId || crypto.randomUUID() }, ...prev];
         });
       }
     };
@@ -100,8 +113,8 @@ const Reports = () => {
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
       const matchesSearch =
-        p.name.toLowerCase().includes(prodSearch.toLowerCase()) ||
-        p.category.toLowerCase().includes(prodSearch.toLowerCase());
+        (p.name || '').toLowerCase().includes(prodSearch.toLowerCase()) ||
+        (p.category || '').toLowerCase().includes(prodSearch.toLowerCase());
       const matchesFilter =
         prodFilter === 'All' ||
         (prodFilter === 'Available' && p.quantity > 0) ||
@@ -164,7 +177,7 @@ const Reports = () => {
     <div className="reports-page">
       <h1>Reports Dashboard</h1>
 
-      {/* Summary Boxes */}
+      {/* Summary */}
       <div className="summary-grid">
         <div className="summary-box">
           <h3>Total Revenue</h3>
@@ -189,48 +202,63 @@ const Reports = () => {
       </div>
 
       {/* Transactions Table */}
-      <section className="report-section">
-        <h2>Today's Transactions</h2>
-        <div className="filter-bar">
-          <input
-            type="text"
-            placeholder="Search Order # or Payment..."
-            value={txSearch}
-            onChange={e => setTxSearch(e.target.value)}
-          />
-          <select value={txFilter} onChange={e => setTxFilter(e.target.value)}>
-            <option value="All">All Payment Methods</option>
-            <option value="cash">Cash</option>
-            <option value="card">Card</option>
-            <option value="digital wallet">Digital Wallet</option>
-          </select>
-        </div>
+<section className="report-section">
+  <h2>Today's Transactions</h2>
+  <div className="filter-bar">
+    <input
+      type="text"
+      placeholder="Search Order # or Payment..."
+      value={txSearch}
+      onChange={e => setTxSearch(e.target.value)}
+    />
+    <select value={txFilter} onChange={e => setTxFilter(e.target.value)}>
+      <option value="All">All Payment Methods</option>
+      <option value="cash">Cash</option>
+      <option value="card">Card</option>
+      <option value="digital wallet">Digital Wallet</option>
+    </select>
+  </div>
 
-        <div className="table-wrapper scrollable">
-          <table className="report-table">
-            <thead>
-              <tr>
-                <th>Order #</th>
-                <th>Time</th>
-                <th>Items</th>
-                <th>Payment</th>
-                <th>Total (₱)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTransactions.slice(0, 10).map((tx, index) => (
-                <tr key={tx.orderId || `tx-${index}`}>
-                  <td>{tx.orderId}</td>
-                  <td>{new Date(tx.date).toLocaleTimeString('en-PH', { hour12: true })}</td>
-                  <td>{tx.products?.reduce((sum, p) => sum + (p.quantity || 0), 0)}</td>
-                  <td>{tx.paymentMethod}</td>
-                  <td>{(tx.totalAmount || 0).toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+  <div className="table-wrapper scrollable">
+    <table className="report-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Date & Time</th>
+          <th>Items</th>
+          <th>Payment</th>
+          <th>Total (₱)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredTransactions.slice(0, 10).map(tx => {
+          // Use tx.date or fallback to tx.createdAt
+          const txDate = tx.date || tx.createdAt;
+          const formattedDate = txDate
+            ? new Date(txDate).toLocaleString('en-PH', { timeZone: 'Asia/Manila', hour12: true })
+            : 'N/A';
+
+          // Total quantity of items
+          const totalItems = Array.isArray(tx.products)
+            ? tx.products.reduce((sum, p) => sum + (p.quantity || 0), 0)
+            : 0;
+
+          return (
+            <tr key={tx.orderId || crypto.randomUUID()}>
+              <td>{tx.orderId || 'N/A'}</td>
+              <td>{formattedDate}</td>
+              <td>{totalItems}</td>
+              <td>{tx.paymentMethod || 'N/A'}</td>
+              <td>{(tx.totalAmount || 0).toFixed(2)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    {filteredTransactions.length === 0 && <p>No transactions found.</p>}
+  </div>
+</section>
+
 
       {/* Inventory Table */}
       <section className="report-section">
@@ -260,8 +288,8 @@ const Reports = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.slice(0, 10).map((p, index) => (
-                <tr key={p._id || `prod-${index}`}>
+              {filteredProducts.slice(0, 10).map(p => (
+                <tr key={p._id}>
                   <td>{p.name}</td>
                   <td>{p.category}</td>
                   <td>{p.quantity}</td>
@@ -283,11 +311,7 @@ const Reports = () => {
         <h2>Monthly Sales Trend</h2>
         <div className="charts-container">
           <div className="chart-wrapper">
-            <Line
-              key={lineData.datasets[0].data.join(',')}
-              data={lineData}
-              options={{ responsive: true, maintainAspectRatio: false }}
-            />
+            <Line data={lineData} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>
         </div>
       </section>
@@ -296,18 +320,10 @@ const Reports = () => {
         <h2>Sales by Category</h2>
         <div className="charts-container">
           <div className="chart-wrapper">
-            <Bar
-              key={barData.datasets[0].data.join(',')}
-              data={barData}
-              options={{ responsive: true, maintainAspectRatio: false }}
-            />
+            <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>
           <div className="chart-wrapper">
-            <Pie
-              key={pieData.datasets[0].data.join(',')}
-              data={pieData}
-              options={{ responsive: true, maintainAspectRatio: false }}
-            />
+            <Pie data={pieData} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>
         </div>
       </section>
